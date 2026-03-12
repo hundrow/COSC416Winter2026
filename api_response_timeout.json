@@ -1,0 +1,5 @@
+{
+    "error": {
+        "msg": "cURL error (28): Timeout was reached.Endpoint: http://ccsdsolrnodevipint.in2p3.fr:8983/solr/hal/apiselect/?start=400000000&wt=json&fq=status_i%3A11. Query: start=400000000&wt=json&fq=status_i%3A11See help : /docs"
+    }
+}
