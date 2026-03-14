@@ -1,0 +1,9 @@
+{
+    "response": {
+        "numFound": 690386,
+        "start": 700000,
+        "maxScore": 1.0,
+        "numFoundExact": true,
+        "docs": []
+    }
+}

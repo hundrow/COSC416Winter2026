@@ -2,7 +2,12 @@ import json
 import requests
 
 start = 0
-url = f'https://api.archives-ouvertes.fr/search/?start=1&rows=10000'
+<<<<<<< HEAD
+url = f'https://api.archives-ouvertes.fr/search/?start=12&rows=10'
+=======
+url = f'https://api.archives-ouvertes.fr/search/'
+author_url = 'http://api.archives-ouvertes.fr/ref/authors?rows=10000'
+>>>>>>> 20ccea9 (a)
 response = requests.get(url)
 #response_json = response.get_json()
 print(response.json())
