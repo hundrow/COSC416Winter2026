@@ -5,7 +5,7 @@ import math
 from datetime import date
 
 #year = date.today().year
-year = 2022
+year = 2021
 url_base = 'https://api.archives-ouvertes.fr/search?rows=10000'
 
 while True:
