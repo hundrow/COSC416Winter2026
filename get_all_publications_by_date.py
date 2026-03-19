@@ -58,4 +58,4 @@ while True:
         break
 
 with open('get_all_publications_by_date_log.txt', 'a') as f:
-    f.write(f'end time {datetime.datetime.now()} \n')
+    f.write(f'end time {datetime.datetime.now()} \n\n\n')
