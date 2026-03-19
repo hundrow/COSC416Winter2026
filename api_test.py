@@ -1,14 +1,12 @@
 import json
 import requests
+import datetime
 
 start = 0
-<<<<<<< HEAD
-url = f'https://api.archives-ouvertes.fr/search/?start=12&rows=10'
-=======
-url = f'https://api.archives-ouvertes.fr/search/'
+url = f'https://api.archives-ouvertes.fr/search/?fl=label_s,abstract_s,docid,collection_t,uri_s,collCode_s,keyword_s&rows=10000&start=500000&fq=submittedDateY-i:[2025 TO 2026]'
 author_url = 'http://api.archives-ouvertes.fr/ref/authors?rows=10000'
->>>>>>> 20ccea9 (a)
 response = requests.get(url)
+print(datetime.datetime.now())
 #response_json = response.get_json()
 print(response.json())
 #print(f'{response.status_code}')
