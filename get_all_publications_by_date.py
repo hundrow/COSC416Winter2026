@@ -6,7 +6,7 @@ import datetime
 
 #year = date.today().year
 year = 2026
-url_base = 'https://api.archives-ouvertes.fr/search?rows=10000&indent=true&wt=json&fl=label_s,abstract_s,docid,collection_t,uri_s,collCode_s,keyword_s'
+url_base = 'https://api.archives-ouvertes.fr/search?rows=10000&indent=true&wt=json&fl=label_s,abstract_s,docid,collection_t,uri_s,collCode_s,keyword_s,authFullName_s,title_s,domainAll_s,domainAllCode_s,en_domainAllCodeLabel_fs,fr_domainAllCodeLabel_fs,publicationDateY_i,publicationDateM_i,publicationDateD_i'
 with open('get_all_publications_by_date_log.txt', 'a') as f:
     f.write(f'start time {datetime.datetime.now()} \n')
 
@@ -40,9 +40,9 @@ while True:
                 print(response.json())
                 break
             
-            filename = f'date_full_search/data_{year}_page_{count}.json'
+            filename = f'/mnt/database_data/date_full_search/data_{year}_page_{count}.json'
             with open(filename, 'w') as f:
-                json.dump(response.json(), f, indent=4)
+                json.dump(response.json(), f, indent=4, ensure_ascii=False)
             
             start += 10000
             count += 1
