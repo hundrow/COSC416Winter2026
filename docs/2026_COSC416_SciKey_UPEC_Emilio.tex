@@ -1,0 +1,478 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line only needs to identify funding in the first footnote. If that is unnecessary, please comment.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{balance}
+\usepackage{makecell}
+\usepackage{hyperref}
+\usepackage{url} %for URLs
+\usepackage{listings} %for code
+\usepackage{float}
+\usepackage[colorinlistoftodos]{todonotes} %either this line or the next, not both.
+% \usepackage[disable]{todonotes}
+\usepackage{url}
+
+%% Code listing style set
+\lstset{
+    frame=none,
+%   language=SQL,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=none,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color[rgb]{0,0.4,0}, 
+    stringstyle=\color{purple},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4
+}
+
+
+\usepackage[letterpaper,%
+            left=0.75in,right=0.75in,top=0.75in,bottom=1in,%
+            footskip=.25in,bindingoffset=0.2in]{geometry}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\setlength{\columnsep}{0.25in}
+\setlength{\marginparwidth}{2cm}
+\raggedbottom
+
+\begin{document}
+
+\makeatletter
+\newcommand{\linebreakand}{%
+ \end{@IEEEauthorhalign}
+ \hfill\mbox{}\par
+ \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+
+
+\title{COSC 416 Large-Scale Metadata Indexing \& Cleaning
+}
+
+\author{
+
+    \IEEEauthorblockN{Alex Anthony}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Quintin Dennison}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Clara Elliott}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Cody Jorgenson}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \linebreakand % <-- starts a new row
+
+    \IEEEauthorblockN{Bailey Mawhinney}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Andrew Johnson}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Emilio Iturbide Gonzalez}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+    
+    \and
+    
+    \IEEEauthorblockN{Ga\'etan Hains}
+    \IEEEauthorblockA{ \textit{LACL} \\
+    \textit{Université Paris-Est}\\
+    Créteil, France \\
+    0000-0002-1687-8091} 
+}
+
+\maketitle
+
+%%%%%%%%%%%%% AI Guidelines for AI-Generated Content %%%
+
+% see more here: https://conferences.ieeeauthorcenter.ieee.org/author-ethics/guidelines-and-policies/submission-policies/#:~:text=1.,review%20for%20another%20refereed%20publication.
+
+% IEEE Guidelines for AI-Generated Content
+
+% The use of Artificial Intelligence (AI) and large-scale language models (LLMs) in paper submissions is governed by specific rules. 
+
+% Disclosure is Mandatory: The use of AI-generated text or Content (including text, figures, images, and code) must be disclosed in the acknowledgments section of the paper. The specific AI system used and the sections where it was used should be identified.
+
+% Editing vs. Content Generation:
+
+% Allowed (with recommended disclosure): Using AI for basic editing, grammar enhancement, or translation is standard practice and generally allowed, though disclosure is recommended.
+
+% Prohibited (unless part of analysis): Submissions that include significant, unattributed AI-generated text as the core content of the work are prohibited unless the AI's output itself is the subject of the paper's experimental analysis.
+
+% Author Responsibility: Authors remain fully responsible for the correctness, originality, and veracity of all submitted Content, including checking for plagiarism and "hallucinations" from AI tools. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+
+\end{IEEEkeywords}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section I
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+HAL is an open access archive where researchers can record metadata and full text from their scientific publications, including books, articles, and, in some cases, research datasets or software code repositories. Currently, it contains over 3,760,000 references and nearly 1,400,000 scientific documents, providing a rich resource for bibliometric and content analysis.
+
+The goal of this project is to determine and automate the extraction of keywords that describe the content of publications, based primarily on their abstracts and titles. These keywords are then linked to Wikidata or BNF (Bibliothèque Nationale de France) identifiers, allowing users to characterize publications and explore relationships between authors and their work. 
+
+Our team focuses primarily on the database aspect of this project, including the design, optimization, and querying of tables to efficiently store and analyze the extracted data. In particular, the project aims to:
+\begin{enumerate}
+    \item Implement efficient storage and retrieval mechanisms for large-scale publication datasets.
+    \item Automate the extraction and external linking of descriptive keywords.
+    \item Support comprehensive bibliometric and content analysis, including author collaborations and research domain trends.
+\end{enumerate}
+
+By achieving these objectives, the project contributes both practical improvements to database performance and novel approaches to linking bibliometric data with external knowledge bases.
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section II
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Existing Works}
+
+
+
+%This work is a continuation of the previous research projects described in \cite{} 
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section III
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Methodology and Project Design}
+
+Our team proposes to provide comprehensive Database Administration and Performance
+Tuning services for the SciKey project, focusing on a scalable Oracle 19c database
+architecture for HAL metadata and UPEC publications. We will apply the COSC 416
+top-down tuning methodology (Design → SQL → Instance) to deliver a robust, secure, and
+high-performance database system. This database could be used by the UPEC librarians or prospective authors to find similar papers by keywords or abstract content.
+
+\subsection{Database Schema and Core Entities}
+
+The database schema follows a star schema data warehouse design, optimized for analytical queries and indexing. Centered around the core entity RESEARCH\_ARTICLES. The ERD (Figure \ref{fig:HAL_Schema_Design}) shows the following core tables:
+\begin{enumerate}
+    \item RESEARCH\_ARTICLES: Stores metadata such as unique article identifiers (DOCID), titles (TITLE\_1, TITLE\_2), labels, and publication year (PUBLISH\_YEAR).
+    \item ARTICLE\_AUTHORS: Contains authorship information linked to articles via DOCID, supporting multi-author scenarios.
+    \item ARTICLE\_DOMAINS\_EN and ARTICLE\_DOMAINS\_FR: Provide domain categorizations for articles in English and French respectively.
+    \item ARTICLE\_ABSTRACTS: Holds large textual abstracts connected to each article.
+    \item ARTICLE\_KEYWORDS: Stores keywords linked to articles, supporting efficient keyword-based search.
+    \item ARTICLE\_COLLECTIONS: Groups articles into collections using collection codes.
+    \item ARTICLE\_DOMAINS\_CODE: Manages domain codes linked to articles for classification purposes.
+\end{enumerate}
+
+
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=1.0\textwidth]
+    {images/COSC416_SCHEMA_ERD.jpeg}
+    \caption{HAL Database Schema ERD Design}
+    \label{fig:HAL_Schema_Design}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section IV
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Data Collection From HAL}
+\todo[inline, caption={Section IV: Data Collection}]{
+\fcolorbox{red}{white}{
+    \parbox{0.8\linewidth}{
+        \textbf{Section objective:} Document data acquisition mechanics and ingestion-ready outputs.
+        
+        \textbf{Required evidence to collect before writing:}
+        \begin{itemize}
+            \item Script parameters used for HAL API calls.
+            \item Pagination and throttling policy.
+            \item Error and timeout examples from logs.
+            \item Data quality checks before load.
+        \end{itemize}
+        
+        \textbf{Step-by-step writing guide:}
+        \begin{enumerate}
+            \item Describe endpoint, query filters, and requested fields.
+            \item Explain page size, offset logic, and sleep/retry policy.
+            \item Report observed response-time behavior by year or data slice.
+            \item Show one success response and one timeout/failure case.
+            \item Explain how extracted JSON is staged for Oracle loading.
+        \end{enumerate}
+    }
+}
+}
+\subsection{ Overview Data Collection}
+\todo[inline, caption={}]{
+\fcolorbox{red}{white}{
+    \parbox{0.8\linewidth}{
+        \textbf{Paragraph starters:}
+        \begin{itemize}
+            \item ``The HAL collection pipeline retrieves metadata in paginated batches, storing each response as a reproducible JSON artifact for downstream ETL.''
+            \item ``Observed extraction behavior shows that response latency varies by data slice, making controlled request pacing necessary for reliable long runs.''
+        \end{itemize}
+    }
+}
+}
+\subsection{ Database Storage Architecture }
+\todo[inline, caption={}]{
+\fcolorbox{red}{white}{
+    \parbox{0.8\linewidth}{
+        \textbf{Paragraph starters:}
+        \begin{itemize}
+            \item ``After extraction, records are staged into Oracle load-ready structures that preserve source identifiers and ingestion timestamps for traceability.''
+            \item ``The storage architecture separates raw staging from curated tables to reduce transformation risk and simplify performance troubleshooting.''
+        \end{itemize}
+    }
+}
+}
+%%%%%%%%%%%%%%%%%%%%%%
+%Section V
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Engineered Installation and Configuration}
+\todo[inline, caption={Section V: Installation and Configuration}]{
+\setlength{\fboxrule}{2pt}
+\fcolorbox{red}{white}{
+    \parbox{0.8\linewidth}{
+        This is phase 1 of the Construction epic.\\
+        \textbf{Section objective:} Explain Oracle environment setup and justify performance-relevant configuration.
+        
+        \textbf{Required evidence to collect before writing:}
+        \begin{itemize}
+            \item Instance and storage configuration snapshot.
+            \item Memory and session-related parameters used in tests.
+            \item Security and auditing settings that impact overhead.
+        \end{itemize}
+        
+        \textbf{Step-by-step writing guide:}
+        \begin{enumerate}
+            \item Describe host and Oracle version details for reproducibility.
+            \item Document initialization parameters that influence performance.
+            \item Explain why each major setting matches the workload profile.
+            \item Record known constraints in the development environment.
+        \end{enumerate}
+        
+        \textbf{Paragraph starters:}
+        \begin{itemize}
+            \item ``Transformation logic maps HAL fields to Oracle target columns while preserving key provenance attributes required for validation and rollback.''
+            \item ``Validation checks are applied before final inserts to reduce downstream correction costs and benchmark noise from bad records.''
+        \end{itemize}
+    }
+}
+}
+\subsection{Host Machine} The construction and benchmark environment is a virtualized Oracle Linux host running in Xen full virtualization. The VM provides 2 vCPUs on Intel Xeon Gold 5218R @ 2.10GHz, 15 GiB RAM, and 7.9 GiB swap. Storage is exposed as xvda/xvdb block devices, and both report non-rotational media (rotational = 0), indicating SSD-backed virtual disks.
+\begin{table}[H]
+    \centering
+    \caption{Infrastructure Baseline for Oracle 19c Testing}
+    \begin{tabular}{|l|l|}
+        \hline
+        Attribute & Value \\
+        \hline
+        CPU topology & 2 CPUs, 1 thread/core, 2 sockets \\
+        CPU model & Intel Xeon Gold 5218R @ 2.10GHz \\
+        Hypervisor & Xen (full virtualization) \\
+        Memory & 15 GiB total, 8.0 GiB available at sample time \\
+        Swap & 7.9 GiB total, 46 MiB used \\
+        OS kernel & Linux 5.15.0-312.187.5.3.el8uek.x86\_64 \\
+        Primary disks & xvda, xvdb (both non-rotational) \\
+        \hline
+    \end{tabular}
+\end{table}
+The \verb|xvdb| drive was added to the VM to increase storage space and reduce I/O contention between the operating system and the database. This isolates application I/O from administrative background tasks and allows for more granular control over block sizes and extent management."
+
+\subsection{Performance Gate Service-Level Objectives}
+For transition to operations, the team defined a pass/fail Performance Gate. These SLOs are measured during a 15-minute steady-state workload interval and validated using Linux host telemetry, SQL Developer query timing, and OEM/AWR evidence.
+
+\begin{table}[H]
+    \centering
+    \caption{Transition Performance Gate Service-Level Objectives}
+    \begin{tabular}{|p{0.10\linewidth}|p{0.24\linewidth}|p{0.28\linewidth}|p{0.28\linewidth}|}
+        \hline
+        SLO ID & Metric & Target (Pass Criteria) & Measurement Source \\
+        \hline
+        SLO-1 & Golden Query latency (P95) & \(\leq\) 1.5 s at nominal load & SQL Developer timing, OEM SQL Monitoring \\
+        \hline
+        SLO-2 & Throughput & TBD by course/project criteria (draft placeholder was \(\geq\) 120 requests/min) & Workload logs, OEM throughput metrics \\
+        \hline
+        SLO-3 & Host CPU saturation & \(\leq\) 75\% average CPU utilization & Linux \texttt{sar -u}, \texttt{vmstat}, OEM Host CPU \\
+        \hline
+        SLO-4 & Storage latency & \(\leq\) 20 ms average await on DB disk & Linux \texttt{iostat -xz}, OEM I/O metrics \\
+        \hline
+        SLO-5 & Top wait-event pressure & No single non-idle wait event \(>\) 25\% DB time & AWR report, OEM Top Activity \\
+        \hline
+        SLO-6 & Plan stability (critical SQL) & Same plan hash across 3 repeated runs/query & SQL Developer Explain Plan, AWR SQL section \\
+        \hline
+    \end{tabular}
+\end{table}
+
+The baseline evidence package includes approved SLO thresholds, the Golden Query set and rationale, the nominal workload profile, and the environment constraints that may affect interpretation.
+
+\subsection{Oracle Storage and Instance Parameters} The key initialization parameters include \todo[inline, caption={list params}]{list parameters and values}, which were chosen to optimize the expected mixed ingestion and analytical workload. The security settings include \todo[inline, caption={security config}]{describe any relevant security or auditing configurations} setting a warning and alert threshold on the concurrency of the CPU, which may introduce overhead but are necessary for compliance and traceability in this project.
+The \verb|HAL| user was created and granted \verb|DBA|, \verb|OEM_MONITOR|, and \verb|SELECT_CATALOG_ROLE| privileges. Its default tablespace was changed from \verb|USERS| located at \url{/u01/app/oracle/oradata/ORCL/orclpdb/users01.dbf} to \verb|HAL_DATA|, which is located at \url{/mnt/database_data/oradata/HAL/hal_data01.dbf}. 
+
+\subsection{Data Transformation for DBMS}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section VI
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Advanced Physical Design and Access Methods}
+\todo[inline, caption={Section VI: Design and Access Methods}]{
+\setlength{\fboxrule}{2pt}
+\fcolorbox{red}{white}{
+    \parbox{0.8\linewidth}{
+         This is phase 2 of the Construction epic.\\
+         \textbf{Section objective:} Present physical schema choices and expected performance impact.
+    
+        \textbf{Required evidence to collect before writing:}
+        \begin{itemize}
+            \item Table design summary and key constraints.
+            \item Index list with purpose per index.
+            \item Access-path expectations and representative execution plans.
+        \end{itemize}
+        
+        \textbf{Step-by-step writing guide:}
+        \begin{enumerate}
+            \item Describe the physical model and why it fits the workload.
+            \item Document index strategy for ingestion and analytical access patterns.
+            \item Include representative query paths and explain plan-based reasoning.
+            \item Record trade-offs (for example, insert overhead versus query speed).
+        \end{enumerate}
+        
+        \textbf{Paragraph starters:}
+        \begin{itemize}
+            \item ``The physical design balances high-volume insert throughput with predictable analytical access by combining normalized core entities with targeted indexing.''
+            \item ``Execution-plan inspection confirms that the selected access methods reduce full scans for high-frequency lookup and filter patterns.''
+        \end{itemize}
+    }
+}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section VII
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Data Loading and Stress Testing}
+\todo[inline, caption={Section VII: Data Loading and Stress Testing}]{
+\setlength{\fboxrule}{2pt}
+\fcolorbox{red}{white}{
+    \parbox{0.8\linewidth}{
+        This is phase 3 of the Construction epic.
+        \textbf{Section objective:} Provide measured before-versus-after performance outcomes.
+    
+        \textbf{Required evidence to collect before writing:}
+        \begin{itemize}
+            \item Baseline load test metrics.
+            \item Tuned load test metrics.
+            \item Query benchmark metrics and concurrency observations.
+            \item Bottleneck evidence and mitigation outcome.
+        \end{itemize}
+        
+        \textbf{Step-by-step writing guide:}
+        \begin{enumerate}
+            \item Report baseline ingest throughput and latency.
+            \item Report tuned results using same workload and data size.
+            \item Compare key query latencies before and after tuning.
+            \item Summarize stress test outcomes under concurrent activity.
+            \item Attribute each improvement to a specific change and supporting evidence.
+        \end{enumerate}
+        
+        \textbf{Paragraph starters:}
+        \begin{itemize}
+            \item ``Baseline tests established a reference profile for both ingestion throughput and representative analytical query latency.''
+            \item ``After applying controlled tuning changes, the system showed measurable improvement in [metric], while [metric] remained a limiting factor.''
+        \end{itemize}
+    }
+}
+}
+%%%%%%%%%%%%%%%%%%%%%%
+%Section VIII
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Project Summary and Discussion}
+\todo[inline, caption={Project Summary}]{
+\setlength{\fboxrule}{2pt}
+\fcolorbox{red}{white}{
+    \parbox{0.8\linewidth}{
+        \textbf{Section objective:} Interpret results, not just list numbers.
+        
+        \textbf{Step-by-step writing guide:}
+        \begin{enumerate}
+            \item Provide a compact before-and-after results table.
+            \item Explain which changes had strongest impact and why.
+            \item Discuss trade-offs, failed attempts, and remaining risks.
+            \item Link findings to course concepts in database performance optimization.
+        \end{enumerate}
+        
+        \textbf{Paragraph starters:}
+        \begin{itemize}
+            \item ``The most significant gain came from [change], which improved [metric] because [reason supported by evidence].''
+            \item ``Some interventions produced limited benefit, indicating that the dominant bottleneck shifted from [component] to [component].''
+        \end{itemize}
+    }
+}
+}
+%%%%%%%%%%%%%%%%%%%%%%
+%Section IX
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+
+
+\section{Future Work and Development}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Acknowledgements
+%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+
+
+The authors used an AI-based language tool to help organize the documentation, refine grammar, and clarify written content. The AI tool did not contribute to the research design, methodology, experiments, analysis, or conclusions. All intellectual contributions and technical decisions are solely those of the authors. Entity Relationship Diagrams (ERD) were created using Lucidchart.
+
+\section*{Appendixes}
+\subsection*{Appendix I}
+\subsection*{Appendix II}
+\subsection*{Appendix III}
+
+
+
+%\bibliographystyle{IEEEtran}
+\balance
+%\bibliography{}
+% AlgTr, Youry, TempBib, 2026-AlgTr, TempBib
+
+\end{document}
