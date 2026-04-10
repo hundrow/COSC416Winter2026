@@ -1,0 +1,303 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line only needs to identify funding in the first footnote. If that is unnecessary, please comment.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{balance}
+\usepackage{makecell}
+\usepackage{hyperref}
+\usepackage{url} %for URLs
+\usepackage{listings} %for code
+\usepackage{float}
+\usepackage[colorinlistoftodos]{todonotes} %either this line or the next, not both.
+% \usepackage[disable]{todonotes}
+
+%% Code listing style set
+\lstset{
+    frame=none,
+%   language=SQL,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=none,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color[rgb]{0,0.4,0},
+    stringstyle=\color{purple},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4
+}
+
+\usepackage[letterpaper,%
+            left=0.75in,right=0.75in,top=0.75in,bottom=1in,%
+            footskip=.25in,bindingoffset=0.2in]{geometry}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\setlength{\columnsep}{0.25in}
+\setlength{\marginparwidth}{2cm}
+\raggedbottom
+
+\begin{document}
+
+\makeatletter
+\newcommand{\linebreakand}{%
+ \end{@IEEEauthorhalign}
+ \hfill\mbox{}\par
+ \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\makeatother
+
+\title{COSC 416 Large-Scale Metadata Indexing \& Cleaning}
+
+\author{
+    \IEEEauthorblockN{Alex Anthony}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Quintin Dennison}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Clara Elliott}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Cody Jorgenson}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \linebreakand
+
+    \IEEEauthorblockN{Bailey Mawhinney}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Andrew Johnson}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Emilio Iturbide Gonzalez}
+    \IEEEauthorblockA{\textit{Computer Science} \\
+    \textit{Okanagan College}\\
+    Kelowna, Canada \\ }
+
+    \and
+
+    \IEEEauthorblockN{Ga\'etan Hains}
+    \IEEEauthorblockA{\textit{LACL} \\
+    \textit{Université Paris-Est}\\
+    Créteil, France \\
+    0000-0002-1687-8091}
+}
+
+\maketitle
+
+%%%%%%%%%%%%% AI Guidelines for AI-Generated Content %%%
+% see more here: https://conferences.ieeeauthorcenter.ieee.org/author-ethics/guidelines-and-policies/submission-policies/#:~:text=1.,review%20for%20another%20refereed%20publication.
+% IEEE Guidelines for AI-Generated Content
+% The use of Artificial Intelligence (AI) and large-scale language models (LLMs) in paper submissions is governed by specific rules.
+% Disclosure is Mandatory: The use of AI-generated text or Content (including text, figures, images, and code) must be disclosed in the acknowledgments section of the paper. The specific AI system used and the sections where it was used should be identified.
+% Editing vs. Content Generation:
+% Allowed (with recommended disclosure): Using AI for basic editing, grammar enhancement, or translation is standard practice and generally allowed, though disclosure is recommended.
+% Prohibited (unless part of analysis): Submissions that include significant, unattributed AI-generated text as the core content of the work are prohibited unless the AI's output itself is the subject of the paper's experimental analysis.
+% Author Responsibility: Authors remain fully responsible for the correctness, originality, and veracity of all submitted Content, including checking for plagiarism and "hallucinations" from AI tools.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+
+\end{IEEEkeywords}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section I
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+HAL is an open access archive where researchers can deposit publication metadata and, when available, full text for books, articles, conference papers, preprints, and related research outputs. The repository used for this project also references the broader ScanR ecosystem, which motivates the long-term goal of aligning HAL metadata with external identifiers such as Wikidata and BNF.
+
+The current repository shows a database-centered implementation of the SciKey project. The completed work focuses on extracting HAL metadata, loading it into an Oracle 19c schema, and validating the resulting physical design with representative SQL workloads and a performance gate. The report therefore emphasizes the database workflow that is actually implemented in the repository:
+\begin{enumerate}
+    \item implement efficient storage and retrieval mechanisms for large-scale HAL publication datasets,
+    \item preserve the source metadata needed for later keyword enrichment and author analysis,
+    \item validate the design with golden queries, AWR evidence, and Oracle performance metrics.
+\end{enumerate}
+
+This framing keeps the report aligned with the current repository: the database extraction, storage, and tuning layers are implemented and measured, while the NLP and web-interface goals remain part of the broader project description.
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section II
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Existing Works}
+
+The project requirements are grounded in the course RFP and the performance-gate requirements defined for the transition from construction to operations. The RFP requires a database design that can support HAL ingestion, query optimization, AWR-based tuning, and a technical report documenting the results. The operational benchmark is formalized by defining a 15-minute baseline window, golden queries, and service-level objectives for latency, throughput, CPU, storage, wait events, and plan stability.
+
+From a database-design perspective, the repository follows standard data-warehouse ideas adapted to publication metadata: a central publication table, child tables for authors, keywords, domains, and abstracts, and pre-aggregated materialized views for common analytical summaries. The physical design is consistent with Oracle performance-tuning guidance because it combines partitioning, selective indexing, and repeatable workload measurement.
+
+The current report does not attempt a literature survey of HAL or bibliometric keyword extraction systems beyond this project framing, because the repository itself is centered on the implementation and operational validation of the database layer.
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section III
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Methodology and Project Design}
+
+The repository implements a top-down Oracle tuning workflow: design, SQL, and instance. At the design level, the team models HAL metadata in a partitioned relational schema. At the SQL level, the project uses a fixed set of golden queries to represent common publication lookups, keyword retrieval, author retrieval, and yearly aggregation patterns. At the instance level, the repository captures instance parameters, host characteristics, and AWR evidence to support a repeatable performance gate.
+
+This methodology matches the course expectations in the RFP and the performance-gate checklist defined in the project documentation. The report below describes the concrete repository artifacts that support each layer rather than abstract design intent.
+
+\subsection{Database Schema and Core Entities}
+
+The database schema is organized around \verb|RESEARCH_ARTICLES|, which acts as the central publication entity. The ERD in Figure~\ref{fig:HAL_Schema_Design} and the DDL in \verb|setup/create_structure.sql| show the following core tables and relationships:
+\begin{enumerate}
+    \item \verb|RESEARCH_ARTICLES| stores the publication identifier \verb|DOCID|, URI, labels, titles, and publication year.
+    \item \verb|ARTICLE_ABSTRACTS| stores the long-form abstract text used for later keyword analysis.
+    \item \verb|ARTICLE_AUTHORS| records the author list for each publication.
+    \item \verb|ARTICLE_KEYWORDS| stores source or derived keywords associated with a publication.
+    \item \verb|ARTICLE_COLLECTIONS| records collection membership, which supports later UPEC-style subset analysis.
+    \item \verb|ARTICLE_DOMAINS_EN| and \verb|ARTICLE_DOMAINS_FR| store English and French domain labels.
+    \item \verb|ARTICLE_DOMAINS_CODE| stores classification codes linked back to the publication key.
+\end{enumerate}
+
+The schema is built for relational integrity rather than denormalized document storage. Foreign keys connect each child table to \verb|RESEARCH_ARTICLES|, and the publication table is range-partitioned by \verb|PUBLISH_YEAR| with yearly interval partitions. That choice supports partition pruning for time-based analysis and keeps the schema aligned with the project’s historical publication data.
+
+
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=1.0\textwidth]
+    {images/COSC416_SCHEMA_ERD.jpeg}
+    \caption{HAL Database Schema ERD Design}
+    \label{fig:HAL_Schema_Design}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section IV
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Data Collection From HAL}
+The HAL extraction workflow is implemented as a set of Python scripts that query the public HAL Solr endpoint at \verb|https://api.archives-ouvertes.fr/search| and store the responses as JSON artifacts for later loading. The scripts request the fields needed by the database design, including \verb|docid|, \verb|label_s|, \verb|abstract_s|, \verb|collection_t|, \verb|uri_s|, \verb|keyword_s|, \verb|authFullName_s|, \verb|title_s|, \verb|domainAll_s|, \verb|domainAllCode_s|, and the publication date components.
+
+The repository shows three extraction patterns. \verb|api_test.py| is an exploratory request that retrieves a small sample and writes a reproducible JSON response. \verb|get_all_publications.py| iterates through large result sets using \verb|rows=10000| and advances the \verb|start| offset until the API returns an error; the script also sleeps for 61 seconds between successful page requests. \verb|get_all_publications_by_date.py| narrows the search year by year, uses the same 10,000-row page size, and writes each page to a dated JSON file under \verb|/mnt/database_data/date_full_search/| while appending timestamps to a log file.
+
+The extraction log shows that the request cadence is intentionally slow enough to keep long runs stable: pages for 2026, 2025, 2024, and earlier were collected sequentially with multi-second response times per page and no manual retry loop. The repo also captures a timeout example in \verb|api_response_timeout.json|, which supports the decision to pace the requests and treat timeout handling as a practical concern rather than a purely theoretical one.
+
+The data-collection narrative should therefore describe a reproducible HAL-to-JSON staging workflow rather than a full ETL implementation. The repository demonstrates acquisition and persistence of source records, but it does not document formal validation rules or deduplication logic before loading into Oracle.
+
+\subsection{ Overview Data Collection}
+The HAL collection pipeline retrieves metadata in paginated batches and stores each response as a reproducible JSON artifact for downstream processing. In practice, the scripts use a fixed page size of 10,000 records for bulk retrieval, with an earlier exploratory path using only five rows to verify the response format and encoding behavior.
+
+Observed extraction behavior varies by year and data slice. The year-based collector writes progress markers to a log file so each batch can be traced later, and the timing data show that the 2026, 2025, 2024, and 2023 slices were all extracted in separate loops. That makes the collection phase auditable and gives the database team a stable staging layer before load.
+
+\subsection{ Database Storage Architecture }
+After extraction, records are staged into Oracle load-ready structures that preserve source identifiers and support later joins to authors, abstracts, keywords, domains, and collections. The database-side setup creates a dedicated \verb|HAL_DATA| tablespace on \verb|/mnt/database_data/oradata/HAL/| and moves the HAL schema objects into that storage area to isolate the workload from the default system tablespaces.
+
+The storage architecture separates the raw ingestion artifacts from the curated Oracle tables. That split reduces transformation risk, makes the source records easy to reprocess, and keeps performance troubleshooting focused on the actual relational schema instead of on the original API response files.
+%%%%%%%%%%%%%%%%%%%%%%
+%Section V
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Engineered Installation and Configuration}
+The construction and benchmark environment is a virtualized Oracle Linux host running in Xen full virtualization. The VM provides 2 vCPUs on an Intel Xeon Gold 5218R @ 2.10GHz, 15 GiB RAM, and 7.9 GiB swap. Storage is exposed as xvda and xvdb block devices, both backed by non-rotational media, so the workload is operating on SSD-backed virtual disks rather than on spinning media.
+
+Oracle 19c is configured for a modest but realistic course-project workload. The relevant parameters include \verb|memory_target=7G|, \verb|memory_max_target=7G|, \verb|processes=300|, \verb|open_cursors=300|, \verb|db_block_size=8192|, and \verb|audit_trail=db|. The instance-specific cache settings show an approximate 4.9 GB SGA target, a 4.1 GB database cache, and a 2.6 GB PGA target. Those values are large enough to keep the HAL schema responsive while still leaving enough headroom for tuning effects to be visible in query and wait-event measurements.
+
+\subsection{Host Machine}
+The host machine description matters because the project is intentionally small enough to run on a single VM, yet large enough to reveal the effects of partitioning, indexing, and summary objects. The repository does not depend on a distributed deployment for this stage, so the report should frame the environment as a reproducible single-node Oracle testbed rather than as a clustered production system.
+
+\subsection{Performance Gate Service-Level Objectives}
+For transition to operations, the team defined a pass or fail Performance Gate. The accepted baseline window is 15 minutes, and the evidence package combines Linux host telemetry, SQL Developer timing, and AWR or OEM output. The threshold in the repository is simple: the system is not considered operational until the Golden Queries are consistently fast, host resources remain under control, and the dominant wait events do not indicate a runaway bottleneck.
+
+The current baseline results show that the gate is met. The representative values are 0.161 s worst-case Golden Query latency, 72 user calls per minute from the AWR load profile, 52.17\% average CPU utilization, 5.04 ms average xvdb await time, and a top non-idle wait share of 3.3\% for direct path read. The five Golden Queries also retained one plan hash each across repeated validation.
+
+\subsection{Oracle Storage and Instance Parameters}
+The storage layout places the HAL schema in a dedicated \verb|HAL_DATA| tablespace at \url{/mnt/database_data/oradata/HAL/hal_data01.dbf}. The setup scripts alter the HAL user to use \verb|HAL_DATA| by default, grant it unlimited quota on that tablespace, and move the core tables and LOB segments online into that storage area. This isolates the project data from the default Oracle tablespaces and makes I/O behavior easier to reason about during benchmarking.
+
+The instance parameters are tuned for reproducibility rather than for raw enterprise scale. Memory is pinned to a 7G target, auditing is enabled at the database level, and the session or process limits are high enough to support the scripted ingestion and the repeatable benchmark runs. That configuration matches the repository's goal: expose measurable tuning improvements on a constrained host instead of hiding them behind excess resources.
+
+\subsection{Data Transformation for DBMS}
+The repository's transformation path is intentionally staged. HAL metadata is harvested as JSON, then mapped into the Oracle schema through load-ready tables that preserve source provenance such as DOCID, URI, titles, labels, and publication year. The current codebase documents the staging inputs and the relational target design, but it does not show a separate deduplication engine or a large bespoke ETL framework. For the report, that means the methodology should be described as controlled staging plus relational loading, not as a fully automated data warehouse pipeline.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section VI
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Advanced Physical Design and Access Methods}
+The physical model centers on \verb|RESEARCH_ARTICLES|, which is range-partitioned by \verb|PUBLISH_YEAR| with annual interval partitions and a \verb|P_START| partition for the older records. The child tables, including \verb|ARTICLE_ABSTRACTS|, \verb|ARTICLE_AUTHORS|, \verb|ARTICLE_KEYWORDS|, \verb|ARTICLE_COLLECTIONS|, \verb|ARTICLE_DOMAINS_EN|, \verb|ARTICLE_DOMAINS_FR|, and \verb|ARTICLE_DOMAINS_CODE|, are reference-partitioned through their foreign keys back to \verb|RESEARCH_ARTICLES|. That keeps the relational model aligned by year and makes partition maintenance much simpler during load and refresh operations.
+
+The index strategy matches the access patterns that appear in the repository's benchmark queries. \verb|IDX_RA_PUBYEAR_DOCID| supports year filters and article lookups on the parent table. \verb|IDX_KEY_DOC_KEYWORD| and \verb|IDX_DOM_DOC_LABEL| support the keyword and domain lookup paths. \verb|IDX_COLL_DOC_CODE| supports collection lookups, and \verb|IDX_MV_Q4_LOOKUP| plus \verb|IDX_MV_Q5_LOOKUP| support the materialized-view paths used for aggregate reporting. The materialized views \verb|MV_TOP_COLLECTIONS|, \verb|MV_Q5_DOMAINS|, and \verb|MV_Q4_COLLECTIONS| precompute the year-by-collection and year-by-domain summaries that would otherwise require repeated scans and group-by work.
+
+This design deliberately trades extra refresh and index-maintenance cost for much faster reads. That is the correct tradeoff for the current project because the report's validated workload is dominated by repeated analytical lookups, not by continual write-heavy OLTP traffic.
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Section VII
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Data Loading and Stress Testing}
+The repository validates loading and stress testing through repeatable benchmark queries rather than through a one-off success message. The five Golden Queries cover the main access shapes in the HAL catalog: publication profile lookup, keyword lookup, author lookup, yearly aggregation, and domain aggregation. Those queries are the right stress target because they exercise the same parent-child joins, partition filters, and summary paths that the application depends on.
+
+The baseline package documents the operational evidence for a 15-minute steady-state run between AWR snapshots 217 and 218. The measured results show a 0.161 s worst-case Golden Query latency, 72 user calls per minute, 52.17\% average CPU utilization, 5.04 ms average storage await on xvdb, and a top non-idle wait event of direct path read at 3.3\% of DB time. Because the plan hash remained stable across all five Golden Queries, the benchmark demonstrates not just a fast run, but a repeatable one.
+
+The load-testing story in the report should therefore focus on the performance gate outcome. The system is sufficiently tuned for the current course workload, and the remaining question is scalability under higher concurrency. That is the reason the repository also documents the next-step ramp plan, where concurrency is increased only until CPU, I/O, or plan stability first begins to fail.
+%%%%%%%%%%%%%%%%%%%%%%
+%Section VIII
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Project Summary and Discussion}
+The strongest improvement comes from combining year partitioning with targeted indexes and a small set of materialized views. That combination keeps the common access paths short and makes the annual summary queries cheap enough to use as a performance gate. The measured baseline shows that the system is already comfortably within the current target for query latency, and the stable plan hashes indicate that the response time is repeatable rather than accidental.
+
+The main tradeoff is maintenance overhead. Partitioning, index creation, and materialized-view refresh all add work during load and update operations, but that cost is justified because the repository is building an analytical metadata store rather than a high-churn transactional application. The baseline evidence also shows that the current waits are manageable on the present host shape, so the next scalability question is how quickly CPU or I/O headroom disappears when concurrency increases.
+%%%%%%%%%%%%%%%%%%%%%%
+%Section IX
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+This project turns HAL metadata into an Oracle-backed catalog that supports publication, author, keyword, domain, and collection analysis with predictable performance. The repository documents a complete path from staged JSON acquisition to partitioned relational storage, targeted indexing, materialized views, and a validated performance gate. That is the actual methodology reflected by the codebase, and it is a better description than the earlier placeholder narrative.
+
+\section{Future Work and Development}
+Future work should focus on the pieces that are suggested by the surrounding documentation but not yet implemented in the repository. The most obvious next steps are stronger load-time validation, more explicit deduplication rules, automated regression capture for AWR and execution plans, and richer discovery features built on top of the catalog. If the project later adds keyword expansion, authority linking, or a user-facing search interface, those features should be documented as follow-on work rather than as completed functionality in the current report.
+
+%%%%%%%%%%%%%%%%%%%%%%
+%Acknowledgements
+%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+
+
+The authors used an AI-based language tool to help organize the documentation, refine grammar, and clarify written content. The AI tool did not contribute to the research design, methodology, experiments, analysis, or conclusions. All intellectual contributions and technical decisions are solely those of the authors. Entity Relationship Diagrams (ERD) were created using Lucidchart.
+
+\section*{Appendixes}
+\subsection*{Appendix I}
+\subsection*{Appendix II}
+\subsection*{Appendix III}
+
+
+
+%\bibliographystyle{IEEEtran}
+\balance
+%\bibliography{}
+% AlgTr, Youry, TempBib, 2026-AlgTr, TempBib
+
+\end{document}
