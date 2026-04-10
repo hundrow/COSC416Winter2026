@@ -1,5 +1,0 @@
-"NAME","VALUE","ISSPECIFIED"
-"awr_pdb_autoflush_enabled","TRUE","TRUE"
-"db_cache_size","1073741824","TRUE"
-"pga_aggregate_target","0","TRUE"
-"sga_target","0","TRUE"

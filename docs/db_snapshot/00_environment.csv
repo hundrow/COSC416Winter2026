@@ -1,7 +1,0 @@
-"DB_NAME","DBID","CDB","LOG_MODE","OPEN_MODE"
-"ORCL",1740395783,"YES","NOARCHIVELOG","READ WRITE"
-"INSTANCE_NAME","HOST_NAME","VERSION","STARTUP_TIME","STATUS"
-"cdb1","cosc-ora","19.0.0.0.0",26-03-23,"OPEN"
-"BANNER_FULL"
-"Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
-Version 19.3.0.0.0"
