@@ -248,7 +248,7 @@ ORDER BY sql_id;
 --         echo "Starting batch: $n sessions"; \
 --         j=1; \
 --         while [ $j -le $n ]; do \
---           sqlplus -L HAL/HAL@//localhost:1521/ORCLPDB.localdomain @scripts/issue29_workload_driver.sql & \
+--           sqlplus -L HAL/"letmein"@//localhost:1521/ORCLPDB.localdomain @scripts/issue29_workload_driver.sql & \
 --           j=$((j+1)); \
 --         done; \
 --         wait; \
