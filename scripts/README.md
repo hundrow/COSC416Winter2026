@@ -17,9 +17,11 @@ Primary extractor that pulls HAL records year-by-year and paginates results.
 
 Behavior summary:
 - Starts from the current year (`datetime.date.today().year`) and decrements down to year 1
-- Queries HAL-UPEC search API with `https://api.archives-ouvertes.fr/search?rows=10000&indent=true&wt=json&fl=label_s,abstract_s,docid,collection_t,uri_s,collCode_s,keyword_s,authFullName_s,title_s,domainAll_s,domainAllCode_s,en_domainAllCodeLabel_fs,fr_domainAllCodeLabel_fs,publicationDateY_i,publicationDateM_i,publicationDateD_i&start={start}&fq=submittedDateY_i:[{year} TO {year + 1}]`
-- Writes files to `/mnt/database_data/date_full_search/data_<year>_page_<n>.json`
-- Appends run progress to `get_all_publications_by_date_log.txt` in this directory
+- Increments the start value by 10000 each run through the loop to iterate through all the data for the selected year
+- Increments the count value by 1 each run through the loop to store each pagination of the data in a seperate file
+- Queries HAL-UPEC search API with `https://api.archives-ouvertes.fr/search?rows=10000&indent=true&wt=json&fl=label_s,abstract_s,docid,collection_t,uri_s,collCode_s,keyword_s,authFullName_s,title_s,domainAll_s,domainAllCode_s,en_domainAllCodeLabel_fs,fr_domainAllCodeLabel_fs,publicationDateY_i,publicationDateM_i,publicationDateD_i&start=<start>&fq=submittedDateY_i:[<year> TO <year + 1>]`
+- Writes files to `/mnt/database_data/date_full_search/data_<year>_page_<count>.json`
+- Appends run progress to `get_all_publications_by_date_log.txt` in the current directory, keeps track of the time the script takes to run
 
 Run from repository root:
 
@@ -70,7 +72,7 @@ mkdir -p /mnt/database_data/date_full_search
 **Changing the filepath of the saved JSON files**
 
 On line 43 change the filepath variable to your desired filepath
--  `filepath = f'/mnt/database_data/date_full_search/data_{year}_page_{count}.json'` change to  `filepath = f'{YOUR FILEPATH}/data_{year}_page_{count}.json'`
+-  `filepath = f'/mnt/database_data/date_full_search/data_<year>_page_<count>.json'` change to  `filepath = f'<YOUR FILEPATH>/data_<year>_page_<count>.json'`
 
 **Adding or removing fields from the request**
 
